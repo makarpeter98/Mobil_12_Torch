@@ -16,12 +16,40 @@ import android.widget.RemoteViews;
 public class TorchWidget extends AppWidgetProvider {
 
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager, int appWidgetId) {
+        // Construct the RemoteViews object
+        RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.torch_widget);
 
+        Intent intentUpdate = new Intent(context, TorchWidget.class);
+        intentUpdate.setAction("TEST_ACTION");
+        PendingIntent pendingUpdate = PendingIntent.getBroadcast(context,
+                appWidgetId, intentUpdate, PendingIntent.FLAG_UPDATE_CURRENT);
+        views.setOnClickPendingIntent(R.id.torch_button_w, pendingUpdate);
+
+        // Instruct the widget manager to update the widget
+        appWidgetManager.updateAppWidget(appWidgetId, views);
     }
 
     @Override
     public void onReceive(Context context, Intent intent) {
-
+        super.onReceive(context, intent);
+        SharedPreferences prefs =
+                context.getSharedPreferences(MainActivity.SHR_FILENAME, 0);
+        boolean torch = prefs.getBoolean(MainActivity.TORCH_KEY, true);
+        CameraManager camManager =
+                (CameraManager) context.getSystemService(Context.CAMERA_SERVICE);
+        String cameraId = null;
+        try {
+            cameraId = camManager.getCameraIdList()[0];
+            camManager.setTorchMode(cameraId, torch);
+            torch = !torch;
+        }
+        catch (CameraAccessException e) {
+            e.printStackTrace();
+        }
+        // Save count back to prefs.
+        SharedPreferences.Editor prefEditor = prefs.edit();
+        prefEditor.putBoolean(MainActivity.TORCH_KEY, torch);
+        prefEditor.apply();
     }
 
     @Override
