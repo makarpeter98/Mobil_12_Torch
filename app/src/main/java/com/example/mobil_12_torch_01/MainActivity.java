@@ -11,7 +11,7 @@ import android.view.View;
 import android.widget.Button;
 
 public class MainActivity extends AppCompatActivity {
-
+    //Teszt
     public static String myAppID = "hu.unideb.mobil_123456789";
     public static final String TORCH_KEY = myAppID + ".TORCH_KEY";
     public static final String SHR_FILENAME = myAppID + ".SHR_FILENAME";
